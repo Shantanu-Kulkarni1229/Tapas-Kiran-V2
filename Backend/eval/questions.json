@@ -1,0 +1,10 @@
+{
+  "_note": "EXAMPLES ONLY. These 5 entries refer to the FICTIONAL sample documents in /sample-docs (run `npm run sample-docs` then `npm run ingest -- ../sample-docs`). Replace them with real questions about YOUR ingested documents before trusting any number from `npm run eval`. expectedDocument is matched against the document title (substring, case-insensitive); expectedSection is optional. inScope=false means the documents do not contain the answer, and the model should say so.",
+  "questions": [
+    { "question": "How long must a station display a public notice for an item worth more than 5,000 units?", "inScope": true, "expectedDocument": "Sample Lost Property Act", "expectedSection": "5" },
+    { "question": "What is the penalty for failing to report a found item?", "inScope": true, "expectedDocument": "Sample Lost Property Act", "expectedSection": "9" },
+    { "question": "What does the duty officer give the citizen after receiving a lost property report?", "inScope": true, "expectedDocument": "Sample Station Procedure" },
+    { "question": "How are evidence items labelled?", "inScope": true, "expectedDocument": "Sample Evidence Handling Guideline" },
+    { "question": "What is the capital of France?", "inScope": false }
+  ]
+}
