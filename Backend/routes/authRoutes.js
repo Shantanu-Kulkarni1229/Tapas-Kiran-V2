@@ -1,32 +1,29 @@
-// routes/authRoutes.js
-import express from "express";
-import protect from "../middlewares/authMiddleware.js";
-import { 
-  signup, 
-  login, 
-  verifySignupOTP, 
-  verifyLoginOTP, 
-  forgotPassword, 
-  verifyForgotOTP, 
-  resetPassword, 
-  logout
-} from "../controllers/authController.js";
+import { Router } from "express";
+import { z } from "zod";
+import rateLimit from "express-rate-limit";
+import { validate } from "../middleware/validate.js";
+import { protect } from "../middleware/auth.js";
+import { signup, login, me, logout } from "../controllers/authController.js";
 
-const router = express.Router();
+const router = Router();
 
-// Auth-related routes
-router.post("/signup", signup);
-router.post("/login", login);
-router.post("/verify-signup-otp", verifySignupOTP);
-router.post("/verify-login-otp", verifyLoginOTP);
-router.post("/forgot-password", forgotPassword);
-router.post("/verify-forgot-otp", verifyForgotOTP);
-router.post("/reset-password", resetPassword);
-router.post("/logout", logout);
+// Slows down password guessing.
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false, message: { message: "Too many attempts, try again later" } });
 
-// Token validation route
-router.get("/check-token", protect, (req, res) => {
-  res.json({ valid: true, user: req.user });
+const signupSchema = z.object({
+  name: z.string().trim().min(2),
+  email: z.string().trim().email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  phoneNumber: z.string().regex(/^\d{10}$/, "Phone must be 10 digits").optional(),
+  district: z.string().trim().min(1),
+  taluka: z.string().trim().optional(),
+  policeStation: z.string().trim().min(1),
 });
+const loginSchema = z.object({ email: z.string().trim().email(), password: z.string().min(1) });
+
+router.post("/signup", loginLimiter, validate(signupSchema), signup);
+router.post("/login", loginLimiter, validate(loginSchema), login);
+router.get("/me", protect, me);
+router.post("/logout", protect, logout);
 
 export default router;

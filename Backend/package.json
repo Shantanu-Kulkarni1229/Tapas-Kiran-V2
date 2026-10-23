@@ -1,48 +1,41 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
-    "build:kb": "node AI/scripts/buildKB.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "name": "tapas-kiran-backend",
+  "version": "2.0.0",
+  "private": true,
   "type": "module",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "ingest": "node scripts/ingest.js",
+    "eval": "node scripts/eval.js",
+    "sample-docs": "node scripts/makeSamplePdfs.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {},
+    "moduleNameMapper": { "^zod$": "<rootDir>/node_modules/zod/index.cjs" },
+    "testMatch": ["**/tests/**/*.test.js"]
+  },
   "dependencies": {
-    "@langchain/community": "^1.1.19",
-    "@langchain/core": "^1.1.28",
-    "@langchain/google-genai": "^2.1.20",
-    "@langchain/langgraph": "^1.1.5",
-    "@langchain/openai": "^1.2.10",
-    "@langchain/textsplitters": "^1.0.1",
-    "bcryptjs": "^3.0.2",
-    "body-parser": "^2.2.0",
-    "cheerio": "^1.2.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "fs": "^0.0.1-security",
-    "jsonwebtoken": "^9.0.2",
-    "langchain": "^1.2.27",
-    "mammoth": "^1.11.0",
-    "mongoose": "^8.17.0",
-    "multer": "^2.0.2",
-    "nodemailer": "^7.0.5",
-    "openai": "^5.11.0",
-    "path": "^0.12.7",
-    "pdf-lib": "^1.17.1",
-    "pdf-parse": "^2.4.5",
-    "pdfkit": "^0.17.1",
-    "uuid": "^13.0.0",
-    "xlsx": "^0.18.5",
-    "zod": "^4.3.6"
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "docx": "^9.14.0",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.11.3",
+    "multer": "^2.5.0",
+    "pdfjs-dist": "^6.4.299",
+    "pino": "^10.4.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "jest": "^30.5.2",
+    "pdfkit": "^0.20.2",
+    "supertest": "^7.3.1"
   }
 }

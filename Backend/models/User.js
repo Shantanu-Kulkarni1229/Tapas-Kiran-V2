@@ -1,105 +1,39 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+export const ROLES = ["officer", "station_admin", "super_admin"];
+
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: [true, "Name is required"],
-      trim: true,
-      minlength: 2,
-    },
-    email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-      lowercase: true,
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Please provide a valid email address",
-      ],
-    },
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-      minlength: 6,
-    },
-    phoneNumber: {
-      type: String,
-      required: [true, "Phone number is required"],
-      unique: true,
-      match: [/^\d{10}$/, "Please provide a valid 10-digit phone number"],
-    },
-    district: {
-      type: String,
-      required: [true, "District is required"],
-      trim: true,
-    },
-    taluka: {
-      type: String,
-      required: [true, "Taluka is required"],
-      trim: true,
-    },
-    policeStation: {
-      type: String,
-      required: [true, "Police Station is required"],
-      trim: true,
-    },
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
-    otp: {
-      type: String,
-      default: null,
-    },
-    otpExpires: {
-      type: Date,
-      default: null,
-    },
-    registeredAt: {
-      type: Date,
-      default: Date.now,
-    },
-    lastLogin: {
-      type: Date,
-      default: null,
-    },
-    loginHistory: [
-      {
-        timestamp: { type: Date, default: Date.now },
-        ip: { type: String, default: null },
-      },
-    ],
-    lastLogout: {
-      type: Date,
-      default: null,
-    },
-    logoutHistory: [
-      {
-        timestamp: { type: Date, default: Date.now },
-        ip: { type: String, default: null },
-      },
-    ],
-     logoutCount: {
-      type: Number,
-      default: 0,
-    },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    password: { type: String, required: true, select: false }, // bcrypt hash, never returned by default
+    phoneNumber: { type: String, trim: true },
+    district: { type: String, required: true, trim: true },
+    taluka: { type: String, trim: true },
+    policeStation: { type: String, required: true, trim: true },
+    // Used to scope history: officers of one station must not see another station's queries.
+    stationKey: { type: String, index: true },
+    role: { type: String, enum: ROLES, default: "officer" },
+    // New signups start inactive until a station_admin / super_admin approves them.
+    active: { type: Boolean, default: false },
+    lastLogin: Date,
+    lastLogout: Date,
+    loginCount: { type: Number, default: 0 },
   },
-  { timestamps: true } // gives createdAt & updatedAt automatically
+  { timestamps: true }
 );
 
-// Hash password before saving
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+userSchema.pre("validate", function () {
+  this.stationKey = `${this.district}|${this.policeStation}`.toLowerCase();
 });
 
-// Compare entered password with hashed password
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+userSchema.pre("save", async function () {
+  if (this.isModified("password")) this.password = await bcrypt.hash(this.password, 10);
+});
+
+userSchema.methods.matchPassword = function (plain) {
+  return bcrypt.compare(plain, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
-export default User;
+export const User = mongoose.model("User", userSchema);

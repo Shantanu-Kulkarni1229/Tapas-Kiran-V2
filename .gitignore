@@ -1,3 +1,8 @@
 node_modules
 .env
+.env.*
+!.env.example
 *.pdf
+# fictional demo documents are safe to commit (real documents stay ignored)
+!sample-docs/*.pdf
+Backend/AI/docs/

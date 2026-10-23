@@ -1,5 +1,15 @@
 {
-  "dependencies": {
-    "@botpress/webchat": "^3.1.0"
+  "name": "tapas-kiran",
+  "private": true,
+  "scripts": {
+    "dev": "npm run ai && concurrently -k -n api,web -c blue,green \"npm run dev --prefix Backend\" \"npm run dev --prefix Frontend\"",
+    "ai": "docker compose up -d --wait mongo qdrant ollama",
+    "ai:stop": "docker compose stop mongo qdrant ollama",
+    "models": "docker compose exec -T ollama ollama pull bge-m3 && docker compose exec -T ollama ollama pull qwen2.5:7b",
+    "install:all": "npm install && npm install --prefix Backend && npm install --prefix Frontend",
+    "test": "npm test --prefix Backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
